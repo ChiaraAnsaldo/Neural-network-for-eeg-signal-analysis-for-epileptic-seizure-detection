@@ -1,16 +1,9 @@
-#https://medium.com/@naomi.fridman/install-conda-tensorflow-gpu-and-keras-on-ubuntu-18-04-1b403e740e25 install gpu
-
-#INIZIO codice per allenare la rete sulla cpu
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
-#FINE codice per allenare la rete sulla cpu
-from tensorflow.python.client import device_lib
 
 import keras
 import numpy as np
 from keras.models import Sequential
-from keras.layers import  Dense, Conv3D, MaxPooling3D, Dropout, Flatten, BatchNormalization, Conv1D, MaxPooling1D
+from keras.layers import  Dense, Conv2D, MaxPooling2D, Dropout, Flatten, BatchNormalization
 from keras.callbacks import EarlyStopping
 from random import shuffle
 import math
@@ -19,33 +12,15 @@ import math
 #from keras.models import load_model
 # Returns a compiled model identical to the saved one
 #model = load_model('my_model.h5')
-import tensorflow as tf
 
-
-PathSpectogramFolder=''
-OutputPath=''
-OutputPathModels=''
+PathSpectogramFolder='out'
+OutputPath='path'
+OutputPathModels='model/'
 interictalSpectograms=[]
 preictalSpectograms=[]  #This array contains syntetic data, it's created to have a balance dataset and it's used for training
 preictalRealSpectograms=[]  #This array containt the real preictal data, it's used for testing
-patients = ["02"]
+patients = ["02","03"]
 nSeizure=0
-
-def loadParametersFromFile(filePath):
-    global PathSpectogramFolder
-    global OutputPath
-    global OutputPathModels
-    if(os.path.isfile(filePath)):
-        with open(filePath, "r") as f:
-                line=f.readline()
-                if(line.split(":")[0]=="PathSpectogramFolder"):
-                    PathSpectogramFolder=line.split(":")[1].strip()
-                line=f.readline()
-                if(line.split(":")[0]=="OutputPath"):
-                    OutputPath=line.split(":")[1].strip()
-                line=f.readline()
-                if(line.split(":")[0]=="OutputPathModels"):
-                    OutputPathModels=line.split(":")[1].strip()
 
 def loadSpectogramData(indexPat):
     global interictalSpectograms
@@ -127,55 +102,20 @@ def loadSpectogramData(indexPat):
 
 def createModel():
 
-    # Crea il modello
-    model = Sequential()
-
-    # Aggiungi il primo strato convoluzionale 3D
-    model.add(Conv3D(32, kernel_size=(22, 5, 5), activation='relu', data_format='channels_first', input_shape=(1, 22, 59, 114)))
-
-    # Aggiungi un strato di Max Pooling 3D
-    model.add(MaxPooling3D(pool_size=(1, 1, 2)))  # Modifica le dimensioni del pool_size
-
-    # Aggiungi un altro strato convoluzionale 3D
-    model.add(Conv3D(64, kernel_size=(1, 1, 2), activation='relu'))
-
-    # Aggiungi un altro strato di Max Pooling 3D
-    model.add(MaxPooling3D(pool_size=(1, 1, 2)))  # Modifica le dimensioni del pool_size
-
-    # Appiattisci i dati in un vettore
-    model.add(Flatten())
-
-    # Aggiungi un layer completamente connesso
-    model.add(Dense(128, activation='relu'))
-
-    # Aggiungi l'output layer
-    model.add(Dense(2, activation='softmax'))
-
-    # Compila il modello
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-    # Stampa un riepilogo del modello
-    model.summary()
-
-    
-    return model
-
-def createModelIta():
-    input_shape=(1, 22, 59, 114)
     model = Sequential()
     #C1
-    model.add(Conv3D(16, (22, 5, 5), strides=(1, 2, 2), padding='valid',activation='relu',data_format= "channels_first", input_shape=input_shape))
-    model.add(MaxPooling3D(pool_size=(1, 2, 2),data_format= "channels_first",  padding='same'))
+    model.add(Conv2D(16, (5, 5), strides=(1, 1), activation='relu', input_shape=(22, 59, 114)))
+    model.add(MaxPooling2D(pool_size=(1, 2), padding='same'))
     model.add(BatchNormalization())
     
     #C2
-    model.add(Conv3D(32, (1, 3, 3), strides=(1, 1,1), padding='valid',data_format= "channels_first",  activation='relu'))#incertezza se togliere padding
-    model.add(MaxPooling3D(pool_size=(1,2, 2),data_format= "channels_first", ))
+    model.add(Conv2D(32, (1, 3), strides=(1,1), padding='valid', activation='relu'))#incertezza se togliere padding
+    model.add(MaxPooling2D(pool_size=(1, 2)))
     model.add(BatchNormalization())
     
     #C3
-    model.add(Conv3D(64, (1,3, 3), strides=(1, 1,1), padding='valid',data_format= "channels_first",  activation='relu'))#incertezza se togliere padding
-    model.add(MaxPooling3D(pool_size=(1,2, 2),data_format= "channels_first", ))
+    model.add(Conv2D(64, (1, 3), strides=(1,1), padding='valid', activation='relu'))#incertezza se togliere padding
+    model.add(MaxPooling2D(pool_size=(1, 2) ))
     model.add(BatchNormalization())
     
     model.add(Flatten())
@@ -188,6 +128,7 @@ def createModelIta():
     model.compile(loss='categorical_crossentropy', optimizer=opt_adam, metrics=['accuracy'])
     
     return model
+
 
 def getFilesPathWithoutSeizure(indexSeizure, indexPat):
     filesPath=[]
@@ -208,10 +149,11 @@ def generate_arrays_for_training(indexPat, paths, start=0, end=100):
             x = np.load(PathSpectogramFolder+f)
             x=np.array([x])
             x=x.swapaxes(0,1)
+            x=x[0]
             if('P' in f):
-                y = np.repeat([[0,1]],x.shape[0], axis=0)
+                y = np.repeat([[0,1]], x.shape[0], axis=0)
             else:
-                y =np.repeat([[1,0]],x.shape[0], axis=0)
+                y = np.repeat([[1,0]], x.shape[0], axis=0)
             return(x,y)
             
 def generate_arrays_for_predict(indexPat, paths, start=0, end=100):
@@ -223,6 +165,7 @@ def generate_arrays_for_predict(indexPat, paths, start=0, end=100):
             x = np.load(PathSpectogramFolder+f)
             x=np.array([x])
             x=x.swapaxes(0,1)
+            x=x[0]
             yield(x)
 
 class EarlyStoppingByLossVal(keras.callbacks.Callback):
@@ -248,13 +191,10 @@ class EarlyStoppingByLossVal(keras.callbacks.Callback):
 
 def main():
     print("START")
-    loadParametersFromFile("PARAMETERS_CNN.txt")
     if not os.path.exists(OutputPathModels):
         os.makedirs(OutputPathModels)
-    #callback=EarlyStopping(monitor='val_acc', min_delta=0, patience=0, verbose=0, mode='auto', baseline=None)
     callback=EarlyStoppingByLossVal(monitor='val_acc', value=0.975, verbose=1, lower=False)
     print("Parameters loaded")
-    print(device_lib.list_local_devices())
     for indexPat in range(0, len(patients)):
         print('Patient '+patients[indexPat])
         if not os.path.exists(OutputPathModels+"ModelPat"+patients[indexPat]+"/"):
@@ -262,8 +202,8 @@ def main():
         loadSpectogramData(indexPat) 
         print('Spectograms data loaded')
         
-        result='Patient '+patients[indexPat]+'\n'     
-        result='Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR \n'
+        print('Patient '+patients[indexPat]+'\n' )    
+        print('Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR \n')
         for i in range(0, nSeizure):
             print('SEIZURE OUT: '+str(i+1))
             
@@ -271,23 +211,26 @@ def main():
             model = createModel()
             filesPath=getFilesPathWithoutSeizure(i, indexPat)
 
-            x_train, y_train = generate_arrays_for_training(indexPat, filesPath, end=75) #end=75),#It take the first 75%
+            x_train, y_train = generate_arrays_for_training(indexPat, filesPath) #end=75),#It take the first 75%
             
             model.fit(x=x_train, 
                       y=y_train, #end=75),#It take the first 75%
-                      validation_data=generate_arrays_for_training(indexPat, filesPath, start=75),#start=75), #It take the last 25%
+                      #validation_data=generate_arrays_for_training(indexPat, filesPath, start=75),#start=75), #It take the last 25%
                       #steps_per_epoch=10000, epochs=10)
-                      steps_per_epoch=int((len(filesPath)-int(len(filesPath)/100*25))),#*25), 
-                      validation_steps=int((len(filesPath)-int(len(filesPath)/100*75))),#*75),
+                      steps_per_epoch=50,
+                      #steps_per_epoch=int((len(filesPath)-int(len(filesPath)/100*25))),#*25), 
+                      #validation_steps=int((len(filesPath)-int(len(filesPath)/100*75))),#*75),
                       verbose=2,
-                      epochs=300, max_queue_size=2, shuffle=True, callbacks=[callback])# 100 epochs è meglio #aggiungere criterio di stop in base accuratezza
+                      epochs=30, max_queue_size=2, shuffle=True)
+
+                      #callbacks=[callback]# 100 epochs è meglio #aggiungere criterio di stop in base accuratezza
             print('Training end')
             
             print('Testing start')
             filesPath=interictalSpectograms[i]
-            interPrediction=model.predict_generator(generate_arrays_for_predict(indexPat, filesPath), max_queue_size=4, steps=len(filesPath))
+            interPrediction=model.predict(generate_arrays_for_predict(indexPat, filesPath), max_queue_size=4, steps=len(filesPath))
             filesPath=preictalRealSpectograms[i]
-            preictPrediction=model.predict_generator(generate_arrays_for_predict(indexPat, filesPath), max_queue_size=4, steps=len(filesPath))
+            preictPrediction=model.predict(generate_arrays_for_predict(indexPat, filesPath), max_queue_size=4, steps=len(filesPath))
             print('Testing end')
             
 
@@ -350,5 +293,5 @@ def main():
     
 
 if __name__ == '__main__':
-    print(tf.config.list_physical_devices('GPU'))
+    main()
     
