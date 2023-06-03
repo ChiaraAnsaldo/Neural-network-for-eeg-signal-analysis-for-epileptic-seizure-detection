@@ -1,0 +1,47 @@
+Patient 01
+Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR 
+1,28,0,29,295500,0.49122807017543857,0.0
+2,51,0,7,295500,0.8793103448275862,0.0
+3,21,0,36,295500,0.3684210526315789,0.0
+4,0,0,41,295500,0.0,0.0
+5,13,0,12,295500,0.52,0.0
+6,11,0,0,295500,1.0,0.0
+7,0,0,9,295500,0.0,0.0
+Patient 02
+Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR 
+1,29,0,30,327000,0.4915254237288136,0.0
+2,24,0,35,327000,0.4067796610169492,0.0
+3,0,0,59,325500,0.0,0.0
+Patient 03
+Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR 
+1,29,0,30,343500,0.4915254237288136,0.0
+2,0,0,59,343500,0.0,0.0
+3,0,0,59,342000,0.0,0.0
+4,44,0,0,312000,1.0,0.0
+5,13,0,12,312000,0.52,0.0
+6,11,0,0,312000,1.0,0.0
+Patient 05
+Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR 
+1,31,0,30,354000,0.5081967213114754,0.0
+2,24,0,37,354000,0.39344262295081966,0.0
+3,0,0,61,352500,0.0,0.0
+4,0,0,43,322500,0.0,0.0
+5,14,0,13,322500,0.5185185185185185,0.0
+Patient 09
+Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR 
+1,32,0,31,399000,0.5079365079365079,0.0
+2,0,0,63,399000,0.0,0.0
+3,56,0,8,397500,0.875,0.0
+4,0,0,45,363000,0.0,0.0
+Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR 
+1,0,0,3,126000,0.0,0.0
+2,0,0,3,126000,0.0,0.0
+3,0,0,3,124500,0.0,0.0
+4,0,0,1,90000,0.0,0.0
+5,0,0,0,49500,0,0.0
+6,0,0,0,39000,0,0.0
+7,0,0,0,22500,0,0.0
+Out Seizure, True Positive, False Positive, False negative, Second of Inter in Test, Sensitivity, FPR 
+1,0,0,5,157500,0.0,0.0
+2,0,0,5,157500,0.0,0.0
+3,0,0,5,154500,0.0,0.0
