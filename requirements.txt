@@ -4,3 +4,4 @@ matplotlib
 tqdm
 sphinxcontrib-matlabdomain
 sphinx-autodoc-typehints
+sphinx-rtd-theme
