@@ -1,12 +1,13 @@
 version: 2
 
 build:
-  os: windows
+  os: ubuntu-22.04 
   tools:
     python:
-      version: "3.10"  
-      install:
-        - requirements: requirements.txt  
-
-sphinx:
-  configuration: docs/source/conf.py
+      version: "3.10"
+  jobs:
+    pre_install:
+      - pip install --upgrade pip
+  python:
+    install:
+      - requirements: requirements.txt
