@@ -39,7 +39,7 @@ matlab_short_links = True
 matlab_keep_package_prefix = False
 matlab_auto_link = 'basic'
 
-sys.path.insert(0, os.path.abspath("C:/Users/Lenovo/Desktop/Chiara/Tesi/TNE_HM_nerves/neuron"))
+sys.path.insert(0, os.path.abspath('../../..'))
 
 sys.path.insert(0, os.path.abspath('./_ext'))
 
