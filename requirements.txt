@@ -3,3 +3,4 @@ scipy
 matplotlib
 tqdm
 sphinxcontrib-matlabdomain
+sphinx-autodoc-typehints
